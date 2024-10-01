@@ -1,0 +1,120 @@
+
+# Documentation : Plugin WordPress - Alerte Météo
+
+## Table des matières :
+1. Introduction
+2. Installation du plugin
+3. Configuration des paramètres
+    - 3.1 Option manuelle
+    - 3.2 Option OpenWeather API
+4. Utilisation du shortcode
+5. Personnalisation du style
+6. Dépendances
+7. Support
+
+---
+
+## 1. Introduction :
+
+Le plugin **Alerte Météo** permet d'afficher des alertes météo sur une page WordPress. Vous avez deux options pour afficher les alertes :
+1. **Saisie manuelle d'un message** : Permet d'écrire et d'afficher un message d'alerte personnalisé.
+2. **Utilisation de l'API OpenWeather** : Permet de récupérer des alertes météo en temps réel via l'API OpenWeather pour une ville spécifique.
+
+## 2. Installation du plugin :
+
+1. Téléchargez le fichier ZIP du plugin : alerte-meteo-plugin.zip.
+2. Dans votre tableau de bord WordPress, allez dans **Extensions** > **Ajouter**.
+3. Cliquez sur **Téléverser une extension**.
+4. Sélectionnez le fichier ZIP du plugin puis cliquez sur **Installer**.
+5. Après l'installation, cliquez sur **Activer l'extension**.
+
+---
+
+## 3. Configuration des paramètres :
+
+Une fois le plugin installé et activé, un menu **Alerte Météo** apparaîtra dans votre tableau de bord WordPress. Vous pourrez y configurer les paramètres d'affichage des alertes.
+
+### 3.1 Option Manuelle :
+
+1. Accédez à **Alerte Météo** dans votre tableau de bord WordPress.
+2. Sélectionnez l'option **Saisie Manuelle**.
+3. Dans le champ **Message d'alerte manuel**, saisissez le message que vous souhaitez afficher (exemple : "Fortes tempêtes prévues aujourd'hui").
+4. Cliquez sur **Enregistrer les modifications**.
+
+Le message que vous saisissez sera affiché sur votre site dans la section où vous utiliserez le shortcode.
+
+### 3.2 Option OpenWeather API :
+
+1. Accédez à **Alerte Météo** dans votre tableau de bord WordPress.
+2. Sélectionnez l'option **Utiliser OpenWeather**.
+3. Saisissez la **clé API OpenWeather** (disponible en vous inscrivant sur https://openweathermap.org/api).
+4. Entrez l'**ID de la ville** pour laquelle vous souhaitez obtenir les données météo. Vous pouvez trouver l'ID de votre ville sur le site OpenWeather (exemple : l'ID de Paris est 2988507).
+5. Cliquez sur **Enregistrer les modifications**.
+
+L'API OpenWeather récupérera alors les données météo pour la ville que vous avez configurée, et les informations d'alerte météo seront affichées automatiquement.
+
+---
+
+## 4. Utilisation du shortcode :
+
+Pour afficher le message d'alerte sur une page ou un article, vous devez utiliser le shortcode suivant :
+
+```[alerte_meteo]```
+
+### Instructions :
+1. Accédez à l'éditeur de la page ou de l'article où vous souhaitez afficher l'alerte météo.
+2. Ajoutez le shortcode `[alerte_meteo]` dans l'emplacement souhaité de votre contenu.
+3. Publiez ou mettez à jour la page.
+
+Le plugin affichera alors soit le message d'alerte saisi manuellement, soit les alertes récupérées via l'API OpenWeather, en fonction de l'option sélectionnée.
+
+---
+
+## 5. Personnalisation du style :
+
+Le plugin inclut un fichier CSS qui permet de personnaliser l'apparence du message d'alerte. Vous pouvez modifier ce fichier directement ou ajouter vos propres styles via le thème de votre site.
+
+Le fichier CSS est situé dans le répertoire du plugin et se nomme `alerte-meteo.css`. Voici un exemple de style par défaut inclus dans le plugin :
+
+```
+.alerte-meteo {
+    background-color: #ffcc00;
+    color: #000;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.alerte-meteo strong {
+    color: #ff0000;
+}
+```
+
+### Personnalisation du style :
+1. Vous pouvez modifier les couleurs, la typographie ou d'autres aspects du style en modifiant directement le fichier `alerte-meteo.css`.
+2. Si vous souhaitez conserver les fichiers du plugin intacts, vous pouvez aussi ajouter des styles personnalisés dans le fichier `style.css` de votre thème.
+
+---
+
+## 6. Dépendances :
+
+### API OpenWeather :
+
+Pour utiliser l'option OpenWeather, vous devez :
+1. Créer un compte sur https://openweathermap.org/api.
+2. Obtenir une **clé API**.
+3. Récupérer l'**ID de la ville** que vous souhaitez surveiller.
+
+Le plugin envoie une requête à l'API OpenWeather pour récupérer les conditions météorologiques actuelles. Si des alertes ou des conditions dangereuses sont signalées, elles seront automatiquement affichées sur votre site.
+
+---
+
+## 7. Support :
+
+Si vous avez des questions ou des problèmes avec le plugin, vous pouvez contacter l'auteur à travers le site officiel :
+
+- **Auteur** : Julien Chrétien
+- **Site Web** : https://julienchretien.com
+
+Merci d'utiliser le plugin **Alerte Météo** ! N'hésitez pas à faire des suggestions ou à demander des fonctionnalités supplémentaires si besoin.
