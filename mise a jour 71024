@@ -1,0 +1,133 @@
+<?php
+/*
+Plugin Name: Alerte Météo
+Description: Plugin pour afficher des alertes météo sur une page avec choix entre saisie manuelle et OpenWeather.
+Version: 1.3
+Author: Julien Chrétien
+Author URI: https://julienchretien.com
+*/
+
+// Créer une option dans le menu admin pour les éditeurs
+add_action('admin_menu', 'alerte_meteo_menu');
+
+function alerte_meteo_menu() {
+    // Accès pour les éditeurs (edit_posts)
+    add_menu_page('Alerte Météo', 'Alerte Météo', 'edit_posts', 'alerte-meteo', 'alerte_meteo_options');
+}
+
+// Enqueue le fichier CSS
+add_action('wp_enqueue_scripts', 'alerte_meteo_enqueue_styles');
+function alerte_meteo_enqueue_styles() {
+    wp_enqueue_style('alerte-meteo-css', plugin_dir_url(__FILE__) . 'alerte-meteo.css');
+}
+
+// Page d'options pour le message d'alerte
+function alerte_meteo_options() {
+    ?>
+    <div class="wrap">
+        <h1>Point météo locale de votre secteur</h1>
+        <form method="post" action="">
+            <?php
+                // Vérification des permissions pour soumettre le formulaire
+                if (current_user_can('edit_posts')) {
+                    // Sécurité nonce
+                    wp_nonce_field('save_alerte_meteo_options', 'alerte_meteo_nonce');
+                    ?>
+                    <h3>Options d'alerte météo</h3>
+
+                    <label for="alerte_meteo_message">Message d'alerte manuel :</label>
+                    <textarea id="alerte_meteo_message" name="alerte_meteo_message" rows="5" cols="50"><?php echo get_option('alerte_meteo_message'); ?></textarea><br/><br/>
+
+                    <label for="openweather_api_key">Clé API OpenWeather :</label>
+                    <input type="text" id="openweather_api_key" name="openweather_api_key" value="<?php echo esc_attr(get_option('openweather_api_key')); ?>" /><br/><br/>
+
+                    <label for="openweather_city_id">ID de la ville OpenWeather :</label>
+                    <input type="text" id="openweather_city_id" name="openweather_city_id" value="<?php echo esc_attr(get_option('openweather_city_id')); ?>" /><br/><br/>
+
+                    <input type="submit" name="submit" value="Enregistrer les options" class="button-primary"/>
+                    <?php
+                } else {
+                    echo "Vous n'avez pas les permissions nécessaires pour modifier ces paramètres.";
+                }
+            ?>
+        </form>
+    </div>
+    <?php
+}
+
+// Hook admin_init pour enregistrer les options après soumission du formulaire
+add_action('admin_init', 'alerte_meteo_save_options');
+
+function alerte_meteo_save_options() {
+    if (isset($_POST['submit']) && current_user_can('edit_posts')) {
+        // Vérification du nonce pour sécurité
+        if (!isset($_POST['alerte_meteo_nonce']) || !wp_verify_nonce($_POST['alerte_meteo_nonce'], 'save_alerte_meteo_options')) {
+            return;
+        }
+
+        // Sauvegarder les options sans échappement excessif
+        if (isset($_POST['alerte_meteo_message'])) {
+            update_option('alerte_meteo_message', wp_unslash($_POST['alerte_meteo_message']));
+        }
+
+        if (isset($_POST['openweather_api_key'])) {
+            update_option('openweather_api_key', sanitize_text_field($_POST['openweather_api_key']));
+        }
+
+        if (isset($_POST['openweather_city_id'])) {
+            update_option('openweather_city_id', sanitize_text_field($_POST['openweather_city_id']));
+        }
+
+        // Redirection après la sauvegarde pour éviter les re-soumissions
+        wp_redirect(admin_url('admin.php?page=alerte-meteo&saved=true'));
+        exit;
+    }
+}
+
+// Fonction pour récupérer les alertes via OpenWeather API
+function get_openweather_alert() {
+    $api_key = get_option('openweather_api_key');
+    $city_id = get_option('openweather_city_id');
+    
+    $url = "http://api.openweathermap.org/data/2.5/weather?id={$city_id}&appid={$api_key}&lang=fr";
+    $response = wp_remote_get($url);
+
+    if (is_wp_error($response)) {
+        return false;
+    }
+
+    $data = json_decode(wp_remote_retrieve_body($response), true);
+
+    // Vérifier les conditions météo et renvoyer une alerte si nécessaire
+    if ($data && isset($data['weather'][0]['description'])) {
+        return "Point météo locale de votre secteur : " . ucfirst($data['weather'][0]['description']);
+    }
+    
+    return false;
+}
+
+// Fonction pour afficher l'alerte via shortcode
+function afficher_alerte_meteo() {
+    $use_openweather = get_option('alerte_meteo_use_openweather');
+    $message = '';
+
+    if ($use_openweather) {
+        // Utilisation de l'API OpenWeather
+        $message = get_openweather_alert();
+    } else {
+        // Message manuel
+        $message = get_option('alerte_meteo_message');
+    }
+
+    // Supprimer les backslashes
+    $message = stripslashes_deep($message);
+
+    if ($message) {
+        return "<div class='alerte-meteo'><strong>Point météo locale de votre secteur :</strong> $message</div>";
+    } else {
+        return "<div class='alerte-meteo'><strong>Point météo locale de votre secteur :</strong> Aucune alerte météo actuellement.</div>";
+    }
+}
+
+// Enregistrement du shortcode pour afficher l'alerte météo
+add_shortcode('alerte_meteo', 'afficher_alerte_meteo');
